@@ -3,13 +3,10 @@ package markov
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math/rand"
-	"os"
 	"strings"
 	"time"
-	"sync"
-	"flag"
+	"bytes"
 )
 
 type (
@@ -29,7 +26,7 @@ type (
 func NewChain(dat string) *Markov {
 	return &Markov{
 		pairs: make(map[*Prefix]*Suffix),
-		text: strings.Split(dat, " ")
+		text: strings.Split(dat, " "),
 	}
 }
 func (s *Suffix) Add(val string) {
@@ -49,7 +46,7 @@ func (m *Markov) FindPrefixMatches(ref *Prefix) *Suffix { //necessary to have a 
 	return nil
 }
 
-func (m *Markov) Build(input string) *Markov {
+func (m *Markov) Build() *Markov {
 
 	text := m.text
 	var prefix *Prefix //current prefix
@@ -86,15 +83,18 @@ func (m *Markov) PrintMapString() { //debug method to make sure the map was buil
 	}
 }
 
-func (m *Markov) Generate(length int, firstWord string, secondWord string) { //print out n words in a markov chain based on a starting prefix pair
+func (m *Markov) Generate(length int) string { //print out n words in a markov chain based on a starting prefix pair
+	var buff = &bytes.Buffer{}
+
 	var pref1 string = m.text[0]
-	var pref2 = m.text[1] 
-	fmt.Print(firstWord + " " + secondWord)
+	var pref2 = m.text[1]
+	buff.Write([]byte(pref1 + " " + pref2 + " "))
 	for i := 0; i < length; i++ {
 		suff := m.GetNextSuffix(pref1, pref2)
-		fmt.Print(suff + " ")
+		buff.Write([]byte(suff + " "))
 		pref1, pref2 = pref2, suff
 	}
+	return buff.String()
 }
 
 func (m *Markov) GetNextSuffix(w1 string, w2 string) string {

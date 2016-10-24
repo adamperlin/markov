@@ -1,20 +1,35 @@
 ## Markov
-This is a simple markov chain algorithm implementation written in go. It is not particularly efficient, but does yield some interesting results. 
+This is a simple markov chain algorithm implementation written in go. It is not particularly efficient, but does yield some interesting results.
 
 ## Usage
-If you do want to use this, it should be relatively easy. Run:
+Take a look at this example:
+```go
 
-`git clone https://github.com/adamperlin/markov.git`
-If you haven't already, you'll need to install (go)[https://golang.org]
-Next, simply run `go build markov.go`, and you should have an executable. 
+/**
+*Reads from a file, input.txt, and generates a markov chain based on that output
+*/
 
-To generate a chain based on specified file, run: 
-`$ ./markov -f [file]`
-The default file is `markov.txt`
+package main
 
-To generate a specific number of words, run:
-`$ ./markov -n [number of words]`
-Default is 200
+import (
+    "fmt"
+  "markov"
+  "sync"
+  "io/ioutil"
+)
 
-
-
+func main() {
+	dat, err := ioutil.ReadFile("input.txt")
+	if err != nil {
+		panic(err)
+	}
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		str := markov.NewChain(string(dat)).Build().Generate(200)
+    fmt.Printf("%s\n", str)
+	}()
+	wg.Wait()
+}
+```
