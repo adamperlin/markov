@@ -27,7 +27,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		str := markov.NewChain(string(dat)).Build().Generate(200)
+		str := markov.NewChain(string(dat)).Build().Generate(200) //generates 200 words based on input
     fmt.Printf("%s\n", str)
 	}()
 	wg.Wait()
